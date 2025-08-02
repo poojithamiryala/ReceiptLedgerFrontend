@@ -1,103 +1,74 @@
 import Image from "next/image";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import jwt from "jsonwebtoken";
+import { signIn } from "next-auth/react";
+import GoogleSignInButton from "./GoogleSignInButton";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  debugger
+  if (token) {
+    try {
+      if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined in the environment variables");
+      }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (decoded) {
+        // Redirect to the dashboard if the token is valid
+        redirect("/home");
+      }
+    } catch (error) {
+      // If token verification fails, do nothing and continue to render the page
+      console.error("Token verification failed:", error);
+      redirect("/"); // or render a login message instead
+    }
+  }
+  
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 ">
+      <main className="flex flex-col gap-[32px] row-start-2 items-center  bg-[url(/bg-login.png)] bg-cover bg-center bg-no-repeat p-8 sm:p-16 rounded-lg shadow-lg z-10">
+        <div className="flex flex-col gap-[8px] justify-center items-center">
+          <div className="relative flex items-center justify-center gap-2 flex-row">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/receipt-ledger.png"
+              alt="ReceiptLedger Logo"
+              className="float-left"
+              width={100}
+              height={50}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <div>
+              <h1 className="text-2xl">
+                <strong >From Receipts to Reconciliation-</strong>
+              </h1>
+              <h1 className="text-2xl"> All in One Place.</h1>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center gap-4">
+          <GoogleSignInButton />
+        </div>
+        <div className="gap-[16px]">
+          <p className="text-sm text-gray-500 mb-3 " style={{
+            backgroundImage: 'linear-gradient(90deg, hsla(0,0%,100%,0.5), hsla(0,0%,100%,0))',
+          }}>
+            🔄 Automated Receipt Parsing -  No manual entry ever.
+          </p>
+          <p className="text-sm text-gray-500 mb-3" style={{
+            backgroundImage: 'linear-gradient(90deg, hsla(0,0%,100%,0.5), hsla(0,0%,100%,0))',
+          }}>
+            📂 Unified Ledger View - All transactions, one dashboard.
+          </p>
+          <p className="text-sm text-gray-500 mb-3" style={{
+            backgroundImage: 'linear-gradient(90deg, hsla(0,0%,100%,0.5), hsla(0,0%,100%,0))',
+          }}>
+            ✅ Effortless Reconciliation - Instantly detect mismatches.
+          </p>.
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
